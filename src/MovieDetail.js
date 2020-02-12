@@ -1,5 +1,6 @@
 /* eslint react/no-did-mount-set-state: 0 */
 import React, { Component } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 import Overdrive from 'react-overdrive';
 import { Poster } from './Movie';
@@ -9,15 +10,16 @@ const BACKDROP_PATH = 'http://image.tmdb.org/t/p/w1280';
 
 class MovieDetail extends Component {
   state = {
-    movie: {},
-  }
+    movie: {}
+  };
 
   async componentDidMount() {
     try {
-      const res = await fetch(`https://api.themoviedb.org/3/movie/${this.props.match.params.id}?api_key=hi&language=en-US`);
-      const movie = await res.json();
+      const movie = await axios.get(
+        `https://api.themoviedb.org/3/movie/${this.props.match.params.id}?api_key=hi&language=en-US`
+      );
       this.setState({
-        movie,
+        movie
       });
     } catch (e) {
       console.log(e);
@@ -26,15 +28,19 @@ class MovieDetail extends Component {
 
   render() {
     const { movie } = this.state;
+    if (!movie.id) return null;
 
     return (
       <MovieWrapper backdrop={`${BACKDROP_PATH}${movie.backdrop_path}`}>
         <MovieInfo>
           <Overdrive id={`${movie.id}`}>
-            <Poster src={`${POSTER_PATH}${movie.poster_path}`} alt={movie.title} />
+            <Poster
+              src={`${POSTER_PATH}${movie.poster_path}`}
+              alt={movie.title}
+            />
           </Overdrive>
           <div>
-            <h1>{movie.title}</h1>
+            <h1 data-testid="movie-title">{movie.title}</h1>
             <h3>{movie.release_date}</h3>
             <p>{movie.overview}</p>
           </div>

@@ -2,20 +2,21 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Movie from './Movie';
+import axios from 'axios';
 
 class MoviesList extends PureComponent {
   state = {
-    movies: [],
+    movies: []
   };
 
   async componentDidMount() {
     try {
-      const res = await fetch(
-        'https://api.themoviedb.org/3/discover/movie?api_key=hi&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1',
+      const movies = await axios.get(
+        'https://api.themoviedb.org/3/discover/movie?api_key=hi&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1'
       );
-      const movies = await res.json();
+
       this.setState({
-        movies: movies.results,
+        movies: movies.results
       });
     } catch (e) {
       console.log(e);
@@ -23,11 +24,17 @@ class MoviesList extends PureComponent {
   }
 
   render() {
-    return (
-      <MovieGrid>
-        {this.state.movies.map(movie => <Movie key={movie.id} movie={movie} />)}
-      </MovieGrid>
-    );
+    const { movies } = this.state;
+    if (movies.length !== 0)
+      return (
+        <MovieGrid data-testid="movie-grid">
+          {this.state.movies.map(movie => (
+            <Movie key={movie.id} movie={movie} />
+          ))}
+        </MovieGrid>
+      );
+
+    return <h1>Loading...</h1>;
   }
 }
 
